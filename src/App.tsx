@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react"
+import React, { useEffect, useMemo, useReducer, useState } from "react"
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"
 
 import "./App.css"
@@ -110,6 +110,26 @@ const Login = () => {
 
 const UsersList = () => {
 	const [users, setUsers] = useState<User[]>([])
+	const [searchText, setSearchText] = useState("")
+	const [isSortAscending, setIsSortAscending] = useState(true)
+
+	const filteredUsers = useMemo(
+		() =>
+			users.filter(
+				(user) =>
+					user.first_name.toLowerCase().includes(searchText.toLowerCase()) ||
+					user.last_name.toLowerCase().includes(searchText.toLowerCase())
+			),
+		[searchText, users]
+	)
+
+	const sortedUsers = useMemo(
+		() =>
+			isSortAscending
+				? filteredUsers.sort((a, b) => (a.first_name > b.first_name ? 1 : -1))
+				: filteredUsers.sort((a, b) => (a.first_name > b.first_name ? -1 : 1)),
+		[isSortAscending, filteredUsers]
+	)
 
 	useEffect(() => {
 		fetchUsers().then((users) => setUsers(users))
@@ -118,6 +138,10 @@ const UsersList = () => {
 	return (
 		<div>
 			<h3>Users List Page</h3>
+			<input value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+			<button onClick={() => setIsSortAscending((p) => !p)}>
+				{isSortAscending ? "Sort: Descending" : "Sort: Ascending"}
+			</button>
 			<table>
 				<tr>
 					<th>Avatar</th>
@@ -125,7 +149,7 @@ const UsersList = () => {
 					<th>Last Name</th>
 					<th>Email</th>
 				</tr>
-				{users.map((user, index) => (
+				{sortedUsers.map((user, index) => (
 					<tr key={user.id}>
 						<td>
 							<img src={user.avatar} alt={user.first_name} />
