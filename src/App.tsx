@@ -80,7 +80,7 @@ const Login = () => {
 					onChange={(e) => {
 						dispatch({
 							type: "EMAIL_CHANGE",
-							payload: { name: "email", value: e.target.value },
+							payload: e.target.value,
 						})
 					}}
 					onBlur={() => dispatch({ type: "SET_EMAIL_TOUCHED", payload: "email" })}
@@ -94,9 +94,7 @@ const Login = () => {
 					value={loginFormState.password.value}
 					placeholder="Password"
 					type="password"
-					onChange={(e) =>
-						dispatch({ type: "PASSWORD_CHANGE", payload: { name: "password", value: e.target.value } })
-					}
+					onChange={(e) => dispatch({ type: "PASSWORD_CHANGE", payload: e.target.value })}
 					onBlur={() => dispatch({ type: "SET_PASSWORD_TOUCHED", payload: "password" })}
 				/>
 				{loginFormState.password.touched && (
