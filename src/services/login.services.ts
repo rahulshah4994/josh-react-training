@@ -9,6 +9,14 @@ export const postLogin = (payload: PostLoginPayload): Promise<PostLoginResponse>
 		},
 		body: JSON.stringify(payload),
 	})
-		.then((res) => res.json())
+		.then((res) => {
+			if (res.status >= 400) {
+				res.json().then((data) => {
+					console.log(data)
+					throw new Error(data.error)
+				})
+			}
+			return res.json()
+		})
 		.then((data) => data as PostLoginResponse)
 }

@@ -1,7 +1,10 @@
-import React, { useReducer, useState } from "react"
+import React, { useEffect, useReducer, useState } from "react"
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"
 
 import "./App.css"
 import { postLogin } from "./services/login.services"
+import { fetchUsers } from "./services/users.services"
+import { User } from "./types/users.types"
 const emailRegEx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
 interface LoginFormState {
@@ -42,33 +45,31 @@ const loginFormReducer = (state: LoginFormState, action: ReducerAction) => {
 			return { ...state, password: { ...state.password, touched: true } }
 		default:
 			return state
-		// case "SET_FIELD_VALUE":
-		// 	//Handle errors
-		// 	return {
-		// 		...state,
-		// 		[action.payload.name]: { ...state[action.payload.name], value: action.payload.value },
-		// 	}
-		// case "SET_FIELD_TOUCHED":
-		// 	return state
-		// // default:
-		// // 	return state
 	}
 }
 
-function App() {
+const Login = () => {
+	const navigate = useNavigate()
 	const [token, setToken] = useState<string>("")
 	const [loginFormState, dispatch] = useReducer(loginFormReducer, {
-		email: { value: "", error: "", touched: false },
-		password: { value: "", error: "", touched: false },
+		email: { value: "eve.holt@reqres.in", error: "", touched: false },
+		password: { value: "cityslicka", error: "", touched: false },
 	})
 
 	const handleSubmit = () => {
-		postLogin({ email: loginFormState.email.value, password: loginFormState.password.value }).then(
-			(data) => setToken(data.token)
-		)
+		postLogin({ email: loginFormState.email.value, password: loginFormState.password.value })
+			.then((data) => {
+				setToken(data.token)
+				return data
+			})
+			.then((data) => {
+				console.log(data)
+				navigate("/users")
+			})
+			.catch((err) => {
+				console.log(err)
+			})
 	}
-
-	console.log("HELLO", loginFormState.email, loginFormState.password)
 
 	return (
 		<div className="App">
@@ -78,11 +79,11 @@ function App() {
 					placeholder="Email"
 					onChange={(e) => {
 						dispatch({
-							type: "SET_FIELD_VALUE",
+							type: "EMAIL_CHANGE",
 							payload: { name: "email", value: e.target.value },
 						})
 					}}
-					onBlur={() => dispatch({ type: "SET_FIELD_TOUCHED", payload: "email" })}
+					onBlur={() => dispatch({ type: "SET_EMAIL_TOUCHED", payload: "email" })}
 				/>
 				{loginFormState.email.touched && (
 					<p style={{ color: "red", fontSize: "10px" }}>{loginFormState.email.error}</p>
@@ -94,9 +95,9 @@ function App() {
 					placeholder="Password"
 					type="password"
 					onChange={(e) =>
-						dispatch({ type: "SET_FIELD_VALUE", payload: { name: "password", value: e.target.value } })
+						dispatch({ type: "PASSWORD_CHANGE", payload: { name: "password", value: e.target.value } })
 					}
-					onBlur={() => dispatch({ type: "SET_FIELD_TOUCHED", payload: "password" })}
+					onBlur={() => dispatch({ type: "SET_PASSWORD_TOUCHED", payload: "password" })}
 				/>
 				{loginFormState.password.touched && (
 					<p style={{ color: "red", fontSize: "10px" }}>{loginFormState.password.error}</p>
@@ -106,6 +107,52 @@ function App() {
 			<button onClick={handleSubmit}>Submit</button>
 			<h4>{token}</h4>
 		</div>
+	)
+}
+
+const UsersList = () => {
+	const [users, setUsers] = useState<User[]>([])
+
+	useEffect(() => {
+		fetchUsers().then((users) => setUsers(users))
+	}, [])
+
+	return (
+		<div>
+			<h3>Users List Page</h3>
+			<table>
+				<tr>
+					<th>Avatar</th>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Email</th>
+				</tr>
+				{users.map((user, index) => (
+					<tr key={user.id}>
+						<td>
+							<img src={user.avatar} alt={user.first_name} />
+						</td>
+						<td>{user.first_name}</td>
+						<td>{user.last_name}</td>
+						<td>{user.email}</td>
+					</tr>
+				))}
+			</table>
+		</div>
+	)
+}
+
+function App() {
+	return (
+		<BrowserRouter>
+			<div>
+				<h1>JOSH REACT TRAINING</h1>
+			</div>
+			<Routes>
+				<Route path="/login" element={<Login />} />
+				<Route path="/users" element={<UsersList />} />
+			</Routes>
+		</BrowserRouter>
 	)
 }
 
