@@ -1,8 +1,10 @@
-import { combineReducers, legacy_createStore as createStore } from 'redux'
+import { combineReducers, legacy_createStore as createStore, applyMiddleware } from 'redux'
+import createSagaMiddleware from 'redux-saga'
 import { loginReducer } from './pages/Login/reducer'
 import { usersReducer } from './pages/UsersList/reducer'
 
-const rootReducer = combineReducers({ loginReducer, usersReducer })
+const sagaMiddleware = createSagaMiddleware()
+const rootReducer = combineReducers({ loginReducer, usersReducer, applyMiddleware(sagaMiddleware) })
 
 
 export const store = createStore(rootReducer)

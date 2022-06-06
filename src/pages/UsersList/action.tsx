@@ -1,8 +1,7 @@
 import { User } from "../../types/users.types";
 
-export const setUsersList = function* (payload : User[]){
-    ({
+export const setUsersList = (payload : User[]) => ({
     type : 'SET_USERSLIST',
     payload
 })
-}
+
