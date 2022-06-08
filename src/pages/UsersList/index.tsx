@@ -15,7 +15,7 @@ import { usersReducer } from "./reducer"
 const UsersList = () => {
 	// const [users, setUsers] = useState<User[]>([])
     const dispatch = useDispatch()
-    const {users} = useSelector((state:RootStateType)=> state.usersReducer)
+    const {users} = useSelector((state:any)=> state.usersReducer)
 	const [searchText, setSearchText] = useState("")
 	const [isSortAscending, setIsSortAscending] = useState(true)
 

@@ -56,7 +56,6 @@ const Login = () => {
 
  
     const {token} = useSelector((state:RootStateType) => state.loginReducer)
-    console.log(token)
     const reduxDispatch = useDispatch()
     
 	const [loginFormState, dispatch] = useReducer(loginFormReducer, {
